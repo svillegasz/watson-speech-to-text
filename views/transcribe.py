@@ -7,8 +7,6 @@ transcribe_page = Blueprint('transcribe', __name__)
 
 @transcribe_page.route('/', methods=['GET', 'POST'])
 def index():
-    print('transcribe process start')
-    app.logger.info('asdfasdfasfdasdf')
     form = TranscribeForm()
     if form.validate_on_submit():
         transcribe(form.audio.data)

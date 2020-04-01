@@ -34,7 +34,11 @@
                 </span>
                 <div class="row justify-content-center">
                     <div class="col-2">
-                        <input type="submit" value="Transcribir" class="btn btn-primary btn-lg">
+                        <button id="submit" type="submit"class="btn btn-primary btn-lg">Transcribir</button>
+                        <button class="btn btn-primary btn-lg" type="button" id="spinner" disabled style="display: none;">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Transcribiendo...
+                        </button>
                     </div>
                   </div>
             </form>
@@ -43,6 +47,11 @@
             $('input[type="file"]').change(function(e){
                 var fileName = e.target.files[0].name;
                 $('.custom-file-label').html(fileName);
+            });
+
+            $('form').submit(e => {
+                $('#submit').hide();
+                $('#spinner').show();
             });
         </script>
     </body>
