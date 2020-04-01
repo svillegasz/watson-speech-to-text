@@ -1,14 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
-from services.watson import transcribe
-from forms.transcribe import TranscribeForm
+from flask import Flask
+from views.transcribe import transcribe_page
 
 app = Flask(__name__)
+app.register_blueprint(transcribe_page)
 app.config.from_object('config')
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    form = TranscribeForm()
-    if form.validate_on_submit():
-        transcribe(form.audio.data)
-        return send_file('transcript.txt', as_attachment = True)
-    return render_template('transcribe.html', form=form)
+if __name__ == "__main__":
+    app.run()
