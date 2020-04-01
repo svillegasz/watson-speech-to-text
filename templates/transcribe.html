@@ -1,0 +1,13 @@
+<!doctype html>
+<form method="POST" action="/" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ form.audio.label }} {{ form.audio }}
+    <span>
+        {% if form.audio.errors %}
+          {% for error in form.audio.errors %}
+            {{ error }}
+          {% endfor %}
+        {% endif %}
+      </span>
+    <input type="submit" value="Subir">
+</form>
