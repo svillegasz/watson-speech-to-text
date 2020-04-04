@@ -4,6 +4,10 @@ import app
 from requests.auth import HTTPBasicAuth
 
 auth = HTTPBasicAuth('apikey', os.environ.get('WATSON_API_KEY'))
+params = {
+        'model': 'es-CO_BroadbandModel',
+        'speaker_labels': True
+}
 model = 'es-CO_BroadbandModel'
 
 def transcribe(file_path):
@@ -12,7 +16,7 @@ def transcribe(file_path):
         response = requests.post('https://api.us-east.speech-to-text.watson.cloud.ibm.com/instances/%s/v1/recognize' % os.environ.get('WATSON_INSTANCE'), 
                 data = data.read(),
                 headers = {'Content-Type': 'application/octet-stream'},
-                params = {'model': model},
+                params = params,
                 auth = auth)
 
     app.logger.info('Transcription process finished with status code %s and content:')
