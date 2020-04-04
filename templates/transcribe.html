@@ -9,6 +9,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.js" integrity="sha256-OG/103wXh6XINV06JTPspzNgKNa/jnP1LjPP5Y3XQDY=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js" integrity="sha256-9wRM03dUw6ABCs+AU69WbK33oktrlXamEXMvxUaF+KU=" crossorigin="anonymous"></script>
     </head>
     <body class="bg-light">
         <div class="jumbotron">
@@ -33,11 +34,11 @@
             Dropzone.options.dropper = {
                 paramName: 'file',
                 chunking: true,
-                forceChunking: true,
+                chunkSize: 100000, // bytes,
+                chunksUploaded: (file, done) => polling(file, done),
                 url: '/upload',
                 maxFiles: 1,
                 maxFilesize: 1025, // megabytes
-                chunkSize: 10000, // bytes
                 acceptedFiles: 'audio/flac,audio/mp3,audio/wav,audio/mpeg,audio/ogg',
                 addRemoveLinks: true,
                 dictCancelUpload: 'Cancelar',
@@ -53,6 +54,44 @@
             $('.dz-clickable').click(() => {
                 $$('.dz-remove').forEach(el => el.click()) 
             })
+
+            var polling = (file, done) => {
+                done();
+                $.blockUI({ message: '<div class="bg-light">\
+                        <div>Transcribiendo...</div>\
+                        <div class="spinner-border" role="status">\
+                            <span class="sr-only">Loading...</span>\
+                        </div>\
+                      </div>' });
+                var poll = function() {
+                    $.ajax({
+                        url: '/transcription',
+                        dataType: 'json',
+                        type: 'get',
+                        cache: false,
+                        success: (data) => { // check if available
+                            console.log(data);
+                            if (data.status == 'COMPLETED') {
+                                var element = document.createElement('a');
+                                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.file));
+                                element.setAttribute('download', file.name.split('.')[0] + '.txt');
+                                element.style.display = 'none';
+                                document.body.appendChild(element);
+                                element.click();
+                                document.body.removeChild(element);
+                                clearInterval(pollInterval); 
+                                $.unblockUI();
+                            }
+                        },
+                        error: function(er) { // error logging
+                            clearInterval(pollInterval); 
+                            $.unblockUI();
+                        }
+                    });
+                };
+                var pollInterval = setInterval(() => poll(), 3000);
+                poll();
+            }
         </script>
     </body>
 </html>
