@@ -21,7 +21,7 @@ peewee==3.8.2
 pendulum==2.0.4
 pluggy==0.8.1
 psycopg2-binary==2.7.7
-py==1.7.0
+py==1.10.0
 pydash==4.7.6
 pytest==4.2.0
 python-dateutil==2.6.1
